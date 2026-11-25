@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Neural image decoder</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Neural image decoder</h1>
+      <p>The model uses a mouse's brain activity to identify pictures.</p>
+    </header>
+    <p id="status" role="status">Loading results…</p>
+    <div id="experiment" hidden>
+      <dl class="session-info" aria-label="Session overview">
+        <div><dt>Session</dt><dd id="session"></dd></div>
+        <div><dt>Recorded cells</dt><dd id="totalCells"></dd></div>
+        <div><dt>Training trials</dt><dd id="trainTrials"></dd></div>
+        <div><dt>Test trials</dt><dd id="testTrials"></dd></div>
+      </dl>
+      <section class="workbench" aria-label="Try the decoder">
+        <aside class="controls">
+          <label for="budget">Cells used: <span id="budgetValue"></span></label>
+          <input id="budget" type="range" min="0" max="0" value="0">
+          <div class="range-ends"><span>1 cell</span><span id="budgetMax"></span></div>
+          <label for="trial">Test trial</label>
+          <select id="trial"></select>
+          <div class="button-row"><button id="previous" type="button">Previous</button><button id="next" type="button">Next</button></div>
+          <p id="trialMeta"></p>
+          <p>Move the slider to use more or fewer recorded cells.</p>
+        </aside>
+        <section class="prediction" aria-label="Image predictions">
+          <div class="section-heading"><h2>Image predictions</h2><span id="outcome" role="status"></span></div>
+          <p>The model learned these pictures from earlier trials.</p>
+          <div id="gallery" class="gallery"></div>
+          <p>The bars show the probability the model assigns to each picture.</p>
+          <h3>Spikes, 30 to 250 ms after the picture appeared</h3>
+          <canvas id="signals" height="105" aria-label="Spike counts for the selected cells" role="img"></canvas>
+          <p id="signalCaption"></p>
+        </section>
+      </section>
+      <section class="results-grid" aria-label="Test results">
+        <section>
+          <div class="section-heading"><h2>Accuracy by cell count</h2><span id="currentScore"></span></div>
+          <svg id="curve" viewBox="0 0 620 310" role="img" aria-label="Balanced accuracy by recorded cell count"></svg>
+          <div class="legend"><span><i class="line"></i>Correct labels</span><span><i class="line chance"></i>Random guess</span><span><i class="line shuffled"></i>Shuffled labels</span></div>
+          <p>Accuracy is averaged across pictures, giving each equal weight.</p>
+          <p id="curveNote"></p>
+        </section>
+        <section>
+          <h2>Prediction counts</h2>
+          <div id="confusion" class="confusion"></div>
+          <p>Rows show the actual picture; columns show the prediction. Each number counts trials with that pairing.</p>
+          <p>Counts use the selected cell count and the first cell selection.</p>
+        </section>
+      </section>
+      <details class="region-section">
+        <summary>Leave out a region's recordings</summary>
+        <p>Each model is retrained with one region's recorded signals left out.</p>
+        <p>The last column shows scores after removing as many random cells.</p>
+        <div class="table-scroll"><table><thead><tr><th>Region removed</th><th>Cells removed</th><th>Without region</th><th>Without random cells</th></tr></thead><tbody id="regions"></tbody></table></div>
+      </details>
+      <details class="methods">
+        <summary>How this was tested</summary>
+        <div class="method-copy">
+          <p id="splitInfo"></p>
+          <p>For each cell, the model counts spikes after a picture appears. The window runs from 30 to 250 ms after onset. It ends sooner if the picture disappears.</p>
+          <p>Images 0, 30, 60, and 90 were picked before scoring.</p>
+          <p>Each cell count gets its own logistic regression model, with C=1. Scaling is fitted on the training trials.</p>
+          <p id="controlInfo"></p><p id="limits"></p>
+          <div class="download-links"><a id="summaryDownload" href="summary.json" download="summary.json">Score summary</a><a id="fullDownload" href="results.json" download="results.json">Full results</a></div>
+        </div>
+      </details>
+    </div>
+    <footer><a href="https://observatory.brain-map.org/visualcoding/" target="_blank" rel="noopener">Allen Brain Observatory</a></footer>
+  </main>
+</body>
+</html>
